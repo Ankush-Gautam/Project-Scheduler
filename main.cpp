@@ -1,8 +1,8 @@
-/*
- *  TITLE       :      PROJECT SCHEDULER
- *  DESCRIPTION :      This program helps to schedule the teams of a class or group in a random manner and systematic way.
- *  DEVELOPER   :      Ankush Gautam
- */
+/***************************************************************************************************************************
+ *  TITLE       :   PROJECT SCHEDULER                                                                                      *
+ *  DESCRIPTION :   This program helps to schedule the teams of a class or group in a random manner and systematic way.    *
+ *  DEVELOPER   :   Ankush Gautam                                                                                          *
+ ***************************************************************************************************************************/
 
 #include "Colors.h"
 #include <iostream>
@@ -15,7 +15,7 @@ using namespace std;
 
 /* ==========================================================================================================
     MY DEFINED FUNCTIONS
-   ========================================================================================================= */
+   ========================================================================================================== */
 
 void line(char ch)
 {
@@ -37,7 +37,6 @@ void HEADER(char *title)
     {
         cout << char(176);
     }
-
     black();
     cout << "\n\n\n";
 }
@@ -78,7 +77,7 @@ bool isValidRoll(int roll)
 
 /* ==========================================================================================================
     MY MAIN CLASS
-    ========================================================================================================= */
+   ========================================================================================================== */
 class MyClass
 {
 private:
@@ -94,6 +93,7 @@ public:
     void menu();
     void addTeam();
     void viewAllTeams();
+    bool rollExist(int);
 
     void editTeam();
     void deleteTeam();
@@ -107,7 +107,7 @@ public:
     void readData();
 
 }; // end of MyClass
-
+/* ===================================================== DISPLAY HEADINGS =============================================== */
 void MyClass::displayHeadings()
 {
     darkblue();
@@ -118,7 +118,24 @@ void MyClass::displayHeadings()
 
     black();
 }
+/* ===================================================== ROLL EXISTS ==================================================== */
+bool MyClass::rollExist(int rn)
+{
+    ifstream in;
+    in.open("data.dat", ios::in);
 
+    while(in.read((char*)this, sizeof(*this)))
+    {
+        if(rn == this->roll[0])
+        {
+            in.close();
+            return true;
+        }
+    }
+    in.close();
+    return false;
+}
+/* ================================================ INPUT RECORD ===================================================== */
 void MyClass::inputRecord()
 {
     green();
@@ -126,7 +143,7 @@ void MyClass::inputRecord()
     cout << "\n\t------------";
     black();
     cout << "\n\n\tEnter Project Name: ";
-    cin.ignore();
+    fflush(stdin);
     cin.getline(projectName, 50);
 
     // Record of project Leader
@@ -140,6 +157,7 @@ void MyClass::inputRecord()
     black();
 roll_again:
     cout << "\tEnter Rollnumber of Project Leader :  ";
+    fflush(stdin);
     cin >> roll[0];
     if (!isValidRoll(roll[0]))
     {
@@ -148,9 +166,16 @@ roll_again:
         black();
         goto roll_again;
     }
+    if(rollExist(roll[0]))
+    {
+        red();
+        cout << "\t(This Rollnumber already exists!)\n";
+        black();
+        goto roll_again;
+    }
 name_again:
-    cout << "\n\tEnter Name of Project Leader : ";
-    cin.ignore();
+    cout << "\tEnter Name of Project Leader : ";
+    fflush(stdin);
     cin.getline(memberName[0], 24);
     if (!isValidName(memberName[0]))
     {
@@ -166,56 +191,79 @@ name_again:
     // details of other two members
     for (int i = 1; i < 3; i++)
     {
+        //member index title
         green();
         cout << "\n\tMEMBER " << i + 1;
         cout << "\n\t--------\n";
         black();
+
+        //rollnumbers of member
+roll_again2:
         cout << "\tEnter Rollnumber of Member" << i + 1 << " : ";
+        fflush(stdin);
         cin >> roll[i];
+        fflush(stdin);
+        if (!isValidRoll(roll[i]))
+        {
+            red();
+            cout << "\t(Invalid Rollnumber!)" << '\n';
+            black();
+            goto roll_again2;
+        }
+        if((rollExist(roll[i])) || (roll[i] == roll[0]) || (roll[1] == roll[2]))
+        {
+            red();
+            cout << "\t(This Rollnumber already exists!)\n";
+            black();
+            goto roll_again2;
+        }
 
+        //name of members
+name_again2:
         cout << "\tEnter Name of Member" << i + 1 << " : ";
-        cin.ignore();
+        fflush(stdin);
         cin.getline(memberName[i], 24);
-    }
-}
+        if (!isValidName(memberName[i]))
+        {
+            red();
+            cout << "\t(Invalid Name! Please Use Alphabets Only.)" << '\n';
+            black();
+            goto name_again2;
+        }
 
+    }//end of input_details for 2members
+}
+/* ================================================== DISPLAY A TEAM ======================================================= */
 void MyClass::displayRecord()
 {
     cout << '\t' << std::left << setw(10) << teamID << setw(49) << projectName;
-
     for (int i = 0; i < 3; i++)
     {
         cout << setw(24) << memberName[i];
     }
     cout << '\n';
 }
-
+/* ===================================================== ADD TEAM =========================================================== */
 void MyClass::addTeam()
 {
     HEADER("ADD A TEAM");
     char yesno;
 
-    inputRecord();
-    storeData();
+    this->inputRecord();
+    this->storeData();
 
     darkgreen();
     cout << "\n\tTeam Successfully Added.";
     black();
 
-    line('-');
+    line('.');
     cout << "\tDo you want to Add Another?(Press 'y' for Yes)\n\t>> ";
     cin >> yesno;
 
     if (yesno == 'y' || yesno == 'Y')
-    {
         addTeam();
-    }
-
-    cout << "\n\t";
-    purple();
-    system("pause");
-    black();
 }
+/* ================================================== VIEW ALL TEAMS ======================================================== */
 void MyClass::viewAllTeams()
 {
     HEADER("ALL TEAMS");
@@ -240,6 +288,7 @@ void MyClass::viewAllTeams()
     system("pause");
     black();
 }
+/* ===================================================== EDIT TEAM ========================================================== */
 void MyClass::editTeam()
 {
     HEADER("EDIT A TEAM's DETAILS");
@@ -249,8 +298,8 @@ void MyClass::editTeam()
 
     ifstream fp;
     ofstream tempfile;
-    fp.open("myRecords.txt", ios::in);
-    tempfile.open("tempfile.txt", ios::out);
+    fp.open("data.dat", ios::in);
+    tempfile.open("tempfile.dat", ios::out);
 
     if (fp.is_open() && numOfRecords() > 0)
     {
@@ -290,8 +339,8 @@ void MyClass::editTeam()
         // if the record is found and updated , Now renaming the tempfile
         if (found)
         {
-            remove("myRecords.txt");
-            rename("tempfile.txt", "myRecords.txt");
+            remove("data.dat");
+            rename("tempfile.dat", "data.dat");
             green();
             cout << "Record Successfully Updated.";
             black();
@@ -302,6 +351,14 @@ void MyClass::editTeam()
             cout << "\tNo Match Found!";
             black();
         }
+
+        line('.');
+        char yesno;
+        cout << "\tDo you want to Edit Another?(Press 'y' for Yes)\n\t>> ";
+        cin >> yesno;
+
+        if (yesno == 'y' || yesno == 'Y')
+            editTeam();
     }
     else
     {
@@ -316,6 +373,7 @@ void MyClass::editTeam()
     black();
 }
 
+/* ===================================================== SEARCH TEAM ============================================================== */
 void MyClass::searchTeam()
 {
     HEADER("SEARCH A TEAM");
@@ -324,7 +382,7 @@ void MyClass::searchTeam()
     int found = 0;
 
     ifstream fp;
-    fp.open("myRecords.txt", ios::in);
+    fp.open("data.dat", ios::in);
 
     if (fp.is_open())
     {
@@ -346,7 +404,6 @@ void MyClass::searchTeam()
                 displayRecord();
             }
         }
-        // closing the files
         fp.close();
 
         if (!found)
@@ -355,19 +412,26 @@ void MyClass::searchTeam()
             cout << "\tNo Match Found!";
             black();
         }
+
+        //If user wants to search again
+        line('.');
+        char yesno;
+        cout << "\tDo you want to Search Another?(Press 'y' for Yes)\n\t>> ";
+        cin >> yesno;
+        if (yesno == 'y' || yesno == 'Y')
+            searchTeam();
     }
     else
     {
         red();
         cout << "\tNo Records Found! Add Records First.";
+        cout << "\n\t";
+        purple();
+        system("pause");
         black();
     }
-
-    cout << "\n\t";
-    purple();
-    system("pause");
-    black();
 }
+/* ===================================================== DELETE TEAM ============================================================== */
 void MyClass::deleteTeam()
 {
     HEADER("DELETE A TEAM");
@@ -377,8 +441,8 @@ void MyClass::deleteTeam()
 
     ifstream fp;
     ofstream tempfile;
-    fp.open("myRecords.txt", ios::in);
-    tempfile.open("tempfile.txt", ios::out);
+    fp.open("data.dat", ios::in);
+    tempfile.open("tempfile.dat", ios::out);
 
     if (fp.is_open())
     {
@@ -411,8 +475,8 @@ void MyClass::deleteTeam()
         // if the record is found and updated , Now renaming the tempfile
         if (found)
         {
-            remove("myRecords.txt");
-            rename("tempfile.txt", "myRecords.txt");
+            remove("data.dat");
+            rename("tempfile.dat", "data.dat");
             darkgreen();
             cout << "\n\tRecord Successfully Deleted.";
             black();
@@ -423,23 +487,31 @@ void MyClass::deleteTeam()
             cout << "\tNo Match Found!";
             black();
         }
+
+        line('.');
+        char yesno;
+        cout << "\tDo you want to Delete Another?(Press 'y' for Yes)\n\t>> ";
+        cin >> yesno;
+
+        if (yesno == 'y' || yesno == 'Y')
+            deleteTeam();
+
     }
     else
     {
         red();
-        cout << "\tNo Records Found! Add Records First.";
+        cout << "\tNo Records Found! Add Records First.\n\t";
+        purple();
+        system("pause");
         black();
     }
-
-    cout << "\n\t";
-    purple();
-    system("pause");
-    black();
 }
+
+/* ===================================================== NUM OF RECORDS ======================================================= */
 int MyClass::numOfRecords()
 {
     ifstream in;
-    in.open("myRecords.txt", ios::in);
+    in.open("data.dat", ios::in);
     // if file is empty
     if (!in.is_open())
     {
@@ -451,10 +523,11 @@ int MyClass::numOfRecords()
 
     return n; // returns total number of recors as totalsize/size_per_one_obj
 }
+/* ===================================================== STORE DATA =============================================================== */
 void MyClass::storeData()
 {
     ofstream fp;
-    fp.open("myRecords.txt", ios::app);
+    fp.open("data.dat", ios::app);
     fp.write((char *)this, sizeof(*this));
     fp.close();
 }
@@ -462,7 +535,7 @@ void MyClass::storeData()
 void MyClass::readData()
 {
     ifstream fin;
-    fin.open("myRecords.txt", ios::in);
+    fin.open("data.dat", ios::in);
     if (fin.is_open() && numOfRecords() > 0)
     {
         while (fin.read((char *)this, sizeof(*this)))
@@ -479,7 +552,7 @@ void MyClass::readData()
         black();
     }
 }
-
+/* ===================================================== MENU ================================================================== */
 void MyClass::menu()
 {
     int choice;
@@ -521,16 +594,16 @@ void MyClass::menu()
             schedule();
             break;
         }
-    } while (choice != 0);
+    }
+    while (choice != 0);
 }
-
-// schedule the core of this project
+/* ===================================================== SCHEDULE ================================================================== */
 void MyClass::schedule()
 {
     HEADER("SCHEDULE TEAMS");
 
     ifstream fptr;
-    fptr.open("myRecords.txt", ios::in);
+    fptr.open("data.dat", ios::in);
     int n = numOfRecords();
 
     // if the file exists or atleast has a record to schedule
@@ -648,7 +721,8 @@ void MyClass::schedule()
                 system("pause");
                 black();
             }
-        } while (sortChoice != 0);
+        }
+        while (sortChoice != 0);
 
         delete obj;
     }
@@ -664,7 +738,7 @@ void MyClass::schedule()
     }
 }
 
-// takes an array and total no of records as parameters to randomize the indexes
+/* ===================================================== RANDOM GENERATOR ========================================================= */
 int *MyClass::randomGenerator(int *num, int n)
 {
     srand(time(0));
