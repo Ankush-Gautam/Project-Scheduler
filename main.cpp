@@ -1,28 +1,44 @@
-/*  TITLE       :      PROJECT SCHEDULER
+/*
+ *  TITLE       :      PROJECT SCHEDULER
  *  DESCRIPTION :      This program helps to schedule the teams of a class or group in a random manner and systematic way.
  *  DEVELOPER   :      Ankush Gautam
  */
-#include <iostream>
-#include <fstream>
-#include <iomanip>
-#include <string.h>
-#include <cstdio>
-#include <ctype.h> //for isalpha
+
+#include "Colors.h"     //my custom color function
+#include <iostream>     //cout,cin
+#include <fstream>      //open,is_opne,close,file.write,file.read
+#include <iomanip>      //setw
+#include <string.h>     //strcpy,strcmp
+#include <cstdio>       //rename & remove
+#include <ctype.h>      //isalpha
 using namespace std;
 
 /* ==========================================================================================================
     MY DEFINED FUNCTIONS
     ========================================================================================================= */
+
+void line(char ch)
+{
+    cout << "\n\t";
+    for(int i = 0; i < 122; i++)
+    {
+        cout << char(ch);
+    }
+    cout << '\n';
+}
+
 void HEADER(char* title)
 {
     system("cls");
-    cout << "\n" << title << "\n\n";
+    blue();
+    cout << "\n\t" << title << "\n\n";
 
     for(int i = 0; i < 156; i++)
     {
         cout << char(176);
     }
 
+    black();
     cout << "\n\n\n";
 }
 
@@ -36,7 +52,6 @@ bool isValidName(char* name)
         {
             return false;
         }
-
         i++;
     }
     return true;
@@ -61,6 +76,7 @@ bool isValidRoll(int roll)
         return true;
 }
 
+
 /* ==========================================================================================================
     MY CLASS
     ========================================================================================================= */
@@ -75,6 +91,7 @@ private:
 public:
     void inputRecord();
     void displayRecord();
+    void displayHeadings();
     void menu();
     void addTeam();
     void viewAllTeams();
@@ -83,6 +100,7 @@ public:
     void deleteTeam();
     void searchTeam();
     void schedule();
+    int* randomGenerator(int*, int);
 
     //file handling
     int numOfRecords();
@@ -92,25 +110,44 @@ public:
 };  //end of MyClass
 
 
+void MyClass::displayHeadings()
+{
+    darkblue();
+    cout << '\t' << left << setw(10) << "TEAM ID" << setw(49) << "PROJECT NAME"
+         << setw(24) << "MEMBER 1" << setw(24) << "MEMBER 2" << setw(24) << "MEMBER 3";
+    //line after headings
+    line('=');
+
+    black();
+}
+
 void MyClass::inputRecord()
 {
-    cout << "\tRecord No." << numOfRecords() + 1 << "\n\n";
-
-    cout << "\tEnter Project Name: ";
+    darkcyan();
+    cout << "\tRecord No." << numOfRecords() + 1;
+    cout << "\n\t------------";
+    black();
+    cout << "\n\n\tEnter Project Name: ";
     cin.ignore();
     cin.getline(projectName, 50);
 
     //Record of project Leader
+    cyan();
     cout << "\n\tPROJECT LEADER";
     cout << "\n\t--------------";
+    black();
 
+    darkgreen();
     cout << "\n\t(Your Project Leader's is Your Team's ID)\n";
+    black();
 roll_again:
     cout << "\tEnter Rollnumber of Project Leader :  ";
     cin >> roll[0];
     if(!isValidRoll(roll[0]))
     {
+        red();
         cout << "\t(Invalid Rollnumber!)" << '\n';
+        black();
         goto roll_again;
     }
 name_again:
@@ -119,7 +156,9 @@ name_again:
     cin.getline(memberName[0], 24);
     if(!isValidName(memberName[0]))
     {
-        cout << "\t(Invalid Name! Please use Alphabets Only.)" << '\n';
+        red();
+        cout << "\t(Invalid Name! Please Use Alphabets Only.)" << '\n';
+        black();
         goto name_again;
     }
 
@@ -129,9 +168,10 @@ name_again:
     //details of other two members
     for(int i = 1; i < 3; i++)
     {
+        cyan();
         cout << "\n\tMEMBER " << i + 1;
         cout << "\n\t--------\n";
-
+        black();
         cout << "\tEnter Rollnumber of Member" << i + 1 << " : ";
         cin >> roll[i];
 
@@ -146,54 +186,66 @@ void MyClass::displayRecord()
 {
     cout << '\t'  << left  << setw(10) << teamID << setw(49) << projectName;
 
-    for(int i = 0; i <= 3; i++)
+    for(int i = 0; i < 3; i++)
     {
         cout << setw(24) << memberName[i];
     }
-
     cout << '\n';
 }
 
 void MyClass::addTeam()
 {
-    HEADER("\tADD A TEAM");
+    HEADER("ADD A TEAM");
+    char yesno;
 
     inputRecord();
     storeData();
 
-    cout << "\n\n\tTeam Successfully Added.";
+    darkgreen();
+    cout << "\n\tTeam Successfully Added.";
+    black();
+
+    line('-');
+    cout << "\tDo you want to Add Another?(Press 'y' for Yes)\n\t>> ";
+    cin >> yesno;
+
+    if(yesno == 'y' || yesno == 'Y')
+    {
+        addTeam();
+    }
 
     cout << "\n\t";
+    purple();
     system("pause");
+    black();
 }
 void MyClass::viewAllTeams()
 {
-    HEADER("\tALL TEAMS");
+    HEADER("ALL TEAMS");
 
+    darkgreen();
+    cout << "\tTOTAL TEAMs = " << numOfRecords() << "\n\n";
     //if there is records than only show the headings and stuff
     if(numOfRecords() > 0)
     {
-        cout << '\t' << left << setw(10) << "TEAM ID" << setw(49) << "PROJECT NAME" << setw(24) << "MEMBER 1" << setw(24) << "MEMBER 2" << setw(24) << "MEMBER 3" << "\n\t";
-        //line after headings
-        for(int i = 0; i < 150; i++)
-        {
-            cout << "-";
-        }
-
-        cout << "\n";
+        displayHeadings();
         readData();
     }
     else
     {
+        red();
         cout << "\tNo Records Found! Add Records First.";
+        black();
     }
 
     cout << "\n\t";
+    purple();
     system("pause");
+    black();
 }
 void MyClass::editTeam()
 {
-    HEADER("\tEDIT A TEAM's DETAILS");
+    HEADER("EDIT A TEAM's DETAILS");
 
     int leaderRoll;
     int found = 0;
@@ -205,19 +257,13 @@ void MyClass::editTeam()
     if(fp.is_open())
     {
         //showing data so the user can choose and have clarity
-        cout << left << setw(10) << "\tTEAM ID"  << setw(49) << "PROJECT NAME" << setw(24) << "MEMBER 1" << setw(24) << "MEMBER 2" << setw(24) << "MEMBER 3" << "\n\t";
-        //line after headings
-        for(int i = 0; i < 150; i++)
-        {
-            cout << "-";
-        }
-
-
-        cout << "\n";
+        displayHeadings();
         readData();
 
         //asking rollnumber to compare and update if that rollnumber exists
+        green();
         cout << "\n\tEnter the Group Leader's Rollnumber to Edit: ";
+        black();
         cin >> leaderRoll;
 
         while(fp.read((char*)this, sizeof(*this)))
@@ -252,20 +298,26 @@ void MyClass::editTeam()
     {
         remove("myRecords.txt");
         rename("tempfile.txt", "myRecords.txt");
+        green();
         cout << "Record Successfully Updated.";
+        black();
     }
     else
     {
+        red();
         cout << "\tNo Match Found!";
+        black();
     }
 
     cout << "\n\t";
+    purple();
     system("pause");
+    black();
 }
 
 void MyClass::searchTeam()
 {
-    HEADER("\tSEARCH A TEAM");
+    HEADER("SEARCH A TEAM");
 
     int leaderRoll;
     int found = 0;
@@ -276,36 +328,49 @@ void MyClass::searchTeam()
     if(fp.is_open())
     {
         //asking rollnumber to compare and search if that rollnumber exists
+        green();
         cout << "\n\tEnter the Group Leader's Rollnumber to Search: ";
+        black();
         cin >> leaderRoll;
 
         while(fp.read((char*)this, sizeof(*this)))
         {
             if(leaderRoll == this->roll[0])
             {
+                system("cls");
+                HEADER("SEARCH A TEAM");
+
                 found = 1;
+                displayHeadings();
                 displayRecord();
             }
-
         }
     }
     else
     {
+        red();
         cout << "\tNo Records Found! Add Records First.";
+        black();
     }
 
     //closing the files to perform remove & rename
     fp.close();
 
     if(!found)
+    {
+        red();
         cout << "\tNo Match Found!";
+        black();
+    }
 
     cout << "\n\t";
+    purple();
     system("pause");
+    black();
 }
 void MyClass::deleteTeam()
 {
-    HEADER("\tDELETE A TEAM");
+    HEADER("DELETE A TEAM");
 
     int leaderRoll;
     int found = 0;
@@ -317,19 +382,13 @@ void MyClass::deleteTeam()
     if(fp.is_open())
     {
         //showing data so the user can choose and have clarity
-        cout << left << setw(10) << "\tTEAM ID" <<  setw(49) << "PROJECT NAME" << setw(24) << "MEMBER 1" << setw(24) << "MEMBER 2" << setw(24) << "MEMBER 3" << "\n\t";
-        //line after headings
-        for(int i = 0; i < 150; i++)
-        {
-            cout << "-";
-        }
-
-
-        cout << "\n";
+        displayHeadings();
         readData();
 
         //asking rollnumber to compare and delete if that rollnumber exists
-        cout << "\n\tEnter the Group Leader's Rollnumber to Delete: ";
+        darkgreen();
+        cout << "\n\n\tEnter the Group Leader's Rollnumber to Delete: ";
+        black();
         cin >> leaderRoll;
 
         while(fp.read((char*)this, sizeof(*this)))
@@ -346,7 +405,9 @@ void MyClass::deleteTeam()
     }
     else
     {
+        red();
         cout << "\tNo Records Found! Add Records First.";
+        black();
     }
 
     //closing the files to perform remove & rename
@@ -358,11 +419,15 @@ void MyClass::deleteTeam()
     {
         remove("myRecords.txt");
         rename("tempfile.txt", "myRecords.txt");
+        darkgreen();
         cout << "\n\tRecord Successfully Deleted.";
+        black();
     }
     else
     {
+        red();
         cout << "\tNo Match Found!";
+        black();
     }
 
     cout << "\n\t";
@@ -406,7 +471,9 @@ void MyClass::readData()
     }
     else
     {
+        red();
         cout << "\tNo Records Found! Add Records First.";
+        black();
     }
 }
 
@@ -415,7 +482,7 @@ void MyClass::menu()
     int choice;
     do
     {
-        HEADER("\tPROJECT SCHEDULER");
+        HEADER("PROJECT SCHEDULER");
 
         cout << "\t1. ADD a TEAM" << '\n';
         cout << "\t2. VIEW all TEAMs" << '\n';
@@ -423,11 +490,13 @@ void MyClass::menu()
         cout << "\t4. SEARCH a TEAM" << '\n';
         cout << "\t5. DELETE a TEAM" << '\n';
         cout << "\t6. Schedule TEAMs" << '\n';
-        cout << "\t7. TOTAL TEAMs" << '\n';
         cout << "\t0. EXIT" << '\n';
 
+        darkgreen();
         cout << "\n\tEnter your choice:\n\t>> ";
+        black();
         cin >> choice;
+
 
         switch(choice)
         {
@@ -449,13 +518,6 @@ void MyClass::menu()
         case 6:
             schedule();
             break;
-        case 7:
-            HEADER("\tTOTAL TEAMS");
-            cout << "\n\n\tTotal Number of TEAMs = " << numOfRecords();
-
-            cout << "\n\t";
-            system("pause");
-            break;
         }
 
     }
@@ -465,11 +527,10 @@ void MyClass::menu()
 //schedule the core of this project
 void MyClass::schedule()
 {
-    HEADER("\tSCHEDULE BY RANDOM");
+    HEADER("SCHEDULE BY RANDOM");
 
     fstream fptr;
     fptr.open("myRecords.txt", ios::in);
-
 
     int n = numOfRecords();
     MyClass *obj, temp;
@@ -483,12 +544,17 @@ void MyClass::schedule()
         fptr.read((char*)&obj[i], sizeof(obj[i]));
     }
 
+    //making array to store random index numbers
+    int *myArr;
+    myArr = new int[n];
+    myArr = randomGenerator(myArr, n);
+
     //sorting
     for(int i = 0; i < n; i++)
     {
         for(int j = i + 1; j < n; j++)
         {
-            if(obj[i].roll[0] > obj[j].roll[0])
+            if(obj[i].roll[0] < obj[j].roll[0])
             {
                 temp = obj[i];
                 obj[i] = obj[j];
@@ -497,16 +563,57 @@ void MyClass::schedule()
         }
     }
 
+    displayHeadings();
     //displaying
     for(int i = 0; i < n; i++)
     {
-        obj[i].displayRecord();
+        obj[myArr[i] - 1].displayRecord();
+    }
+
+    delete obj;
+    delete myArr;
+    cout << "\n\t";
+    purple();
+    system("pause");
+    black();
+}
+
+//takes an array and total no of records as parameters to randomize the indexes
+int* MyClass::randomGenerator(int *num, int n)
+{
+    srand(time(0));
+    int temp;
+
+    //new array
+    int *arr;
+    arr = new int[n];
+
+    //initializing array
+    for(int i = 0; i < n; i++)
+    {
+        arr[i] = i + 1;
+    }
+
+    //shuffling the indexes
+    for(int i = n - 1 ; i > 0; --i)
+    {
+        int j = rand() % i;
+
+        //swapping the initialized array with the random one
+        temp =  arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
     }
 
 
-    delete obj;
-    cout << "\n\t";
-    system("pause");
+    //displaying the array
+    for(int i = 0; i < n; i++)
+    {
+        num[i] = arr[i];
+    }
+    delete arr;
+
+    return num;
 }
 
 
