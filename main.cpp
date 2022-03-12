@@ -8,6 +8,7 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
+#include <conio.h>
 #include <string.h>
 #include <cstdio>
 #include <ctype.h>
@@ -27,15 +28,15 @@ void line(char ch)
     cout << '\n';
 }
 
-void HEADER(char *title)
+void HEADER(const char *title)
 {
     system("cls");
     blue();
     cout << "\n\t" << title << "\n\n";
 
-    for (int i = 0; i < 156; i++)
+    for (int i = 0; i < 158; i++)
     {
-        cout << char(176);
+        cout << char(219);
     }
     black();
     cout << "\n\n\n";
@@ -87,18 +88,11 @@ private:
     char projectName[50];
 
 public:
+    //helping funcs
     void inputRecord();
     void displayRecord();
     void displayHeadings();
-    void menu();
-    void addTeam();
-    void viewAllTeams();
     bool rollExist(int);
-
-    void editTeam();
-    void deleteTeam();
-    void searchTeam();
-    void schedule();
     int *randomGenerator(int *, int);
 
     // file handling
@@ -106,7 +100,15 @@ public:
     void storeData();
     void readData();
 
-}; // end of MyClass
+    //menu-items
+    void menu();
+    void addTeam();
+    void viewAllTeams();
+    void editTeam();
+    void deleteTeam();
+    void searchTeam();
+    void schedule();
+};
 /* ===================================================== DISPLAY HEADINGS =============================================== */
 void MyClass::displayHeadings()
 {
@@ -123,10 +125,11 @@ bool MyClass::rollExist(int rn)
 {
     ifstream in;
     in.open("data.dat", ios::in);
+    MyClass rollCheckerObj;
 
-    while(in.read((char*)this, sizeof(*this)))
+    while(in.read((char*)&rollCheckerObj, sizeof(&rollCheckerObj)))
     {
-        if(rn == this->roll[0])
+        if(rn == rollCheckerObj.roll[0])
         {
             in.close();
             return true;
@@ -140,7 +143,7 @@ void MyClass::inputRecord()
 {
     green();
     cout << "\tRecord No." << numOfRecords() + 1;
-    cout << "\n\t------------";
+    cout << "\n\t-----------";
     black();
     cout << "\n\n\tEnter Project Name: ";
     fflush(stdin);
@@ -249,8 +252,8 @@ void MyClass::addTeam()
     HEADER("ADD A TEAM");
     char yesno;
 
-    this->inputRecord();
-    this->storeData();
+    inputRecord();
+    storeData();
 
     darkgreen();
     cout << "\n\tTeam Successfully Added.";
@@ -794,7 +797,7 @@ public:
         cin >> username;
         fflush(stdin);
         cout << "\tEnter password: ";
-        cin >> password;
+        strcpy(password, maskPassword(password));
     }
 
     bool validateUser()
@@ -818,6 +821,30 @@ public:
         }
         return false;
     }
+    char* maskPassword(char* pw)
+    {
+        int i = 0;
+        char ch;
+
+        while((ch = _getch()) != 13)
+        {
+            if(ch == 8)
+            {
+                --i;
+                cout << "\b \b";
+            }
+            else
+            {
+                pw[i] = ch;
+                cout << "*";
+                ++i;
+            }
+        }
+        pw[i] = '\0';
+
+        return pw;
+    }
+
 };
 int UserValidation::guess = 0;
 
@@ -843,5 +870,6 @@ int main()
         cout << "\n\n\tYou tried 5 times and could not validate yourself.\n\tSomething's Fishy!! ";
         system("pause");
     }
+
     return 0;
 }
