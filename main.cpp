@@ -31,14 +31,14 @@ void line(char ch)
 void HEADER(const char *title)
 {
     system("cls");
-    blue();
+    lightblue();
     cout << "\n\t" << title << "\n\n";
 
     for (int i = 0; i < 158; i++)
     {
         cout << char(219);
     }
-    black();
+    gray();
     cout << "\n\n\n";
 }
 
@@ -109,16 +109,123 @@ public:
     void searchTeam();
     void schedule();
 };
+
+/* ================================================ INPUT RECORD ===================================================== */
+void MyClass::inputRecord()
+{
+    green();
+    cout << "\tRecord No." << numOfRecords() + 1;
+    cout << "\n\t-----------";
+    gray();
+    cout << "\n\tEnter Project Name: ";
+    fflush(stdin);
+    cin.getline(projectName, 50);
+
+    // Record of project Leader
+    green();
+    cout << "\n\tPROJECT LEADER";
+    cout << "\n\t--------------";
+    gray();
+
+    green();
+    cout << "\n\t(Your Project Leader's is Your Team's ID)\n";
+    gray();
+roll_again:
+    cout << "\tEnter Rollnumber of Project Leader :  ";
+    fflush(stdin);
+    cin >> roll[0];
+    if (!isValidRoll(roll[0]))
+    {
+        lightred();
+        cout << "\t(Invalid Rollnumber!)" << '\n';
+        gray();
+        goto roll_again;
+    }
+    if(rollExist(roll[0]))
+    {
+        lightred();
+        cout << "\t(This Rollnumber already exists!)\n";
+        gray();
+        goto roll_again;
+    }
+name_again:
+    cout << "\tEnter Name of Project Leader : ";
+    fflush(stdin);
+    cin.getline(memberName[0], 24);
+    if (!isValidName(memberName[0]))
+    {
+        lightred();
+        cout << "\t(Invalid Name! Please Use Alphabets Only.)" << '\n';
+        gray();
+        goto name_again;
+    }
+
+    // making project leader's rollnumber as team's id
+    teamID = roll[0];
+
+    // details of other two members
+    for (int i = 1; i < 3; i++)
+    {
+        //member index title
+        green();
+        cout << "\n\tMEMBER " << i + 1;
+        cout << "\n\t--------\n";
+        gray();
+
+        //rollnumbers of member
+roll_again2:
+        cout << "\tEnter Rollnumber of Member" << i + 1 << " : ";
+        fflush(stdin);
+        cin >> roll[i];
+        fflush(stdin);
+        if (!isValidRoll(roll[i]))
+        {
+            lightred();
+            cout << "\t(Invalid Rollnumber!)" << '\n';
+            gray();
+            goto roll_again2;
+        }
+        if((rollExist(roll[i])) || (roll[i] == roll[0]) || (roll[1] == roll[2]))
+        {
+            lightred();
+            cout << "\t(This Rollnumber already exists!)\n";
+            gray();
+            goto roll_again2;
+        }
+
+        //name of members
+name_again2:
+        cout << "\tEnter Name of Member" << i + 1 << " : ";
+        fflush(stdin);
+        cin.getline(memberName[i], 24);
+        if (!isValidName(memberName[i]))
+        {
+            lightred();
+            cout << "\t(Invalid Name! Please Use Alphabets Only.)" << '\n';
+            gray();
+            goto name_again2;
+        }
+
+    }//end of input_details for 2members
+}
 /* ===================================================== DISPLAY HEADINGS =============================================== */
 void MyClass::displayHeadings()
 {
-    darkblue();
+    gray();
     cout << '\t' << std::left << setw(10) << "TeamID" << setw(49) << "PROJECT NAME"
          << setw(24) << "MEMBER 1" << setw(24) << "MEMBER 2" << setw(24) << "MEMBER 3";
     // line after headings
     line('=');
-
-    black();
+}
+/* =================================================== DISPLAY A TEAM ======================================================= */
+void MyClass::displayRecord()
+{
+    cout << '\t' << std::left << setw(10) << teamID << setw(49) << projectName;
+    for (int i = 0; i < 3; i++)
+    {
+        cout << setw(24) << memberName[i];
+    }
+    cout << '\n';
 }
 /* ===================================================== ROLL EXISTS ==================================================== */
 bool MyClass::rollExist(int rn)
@@ -138,113 +245,96 @@ bool MyClass::rollExist(int rn)
     in.close();
     return false;
 }
-/* ================================================ INPUT RECORD ===================================================== */
-void MyClass::inputRecord()
+/* ===================================================== NUM OF RECORDS ======================================================= */
+int MyClass::numOfRecords()
 {
-    green();
-    cout << "\tRecord No." << numOfRecords() + 1;
-    cout << "\n\t-----------";
-    black();
-    cout << "\n\n\tEnter Project Name: ";
-    fflush(stdin);
-    cin.getline(projectName, 50);
-
-    // Record of project Leader
-    green();
-    cout << "\n\tPROJECT LEADER";
-    cout << "\n\t--------------";
-    black();
-
-    darkgreen();
-    cout << "\n\t(Your Project Leader's is Your Team's ID)\n";
-    black();
-roll_again:
-    cout << "\tEnter Rollnumber of Project Leader :  ";
-    fflush(stdin);
-    cin >> roll[0];
-    if (!isValidRoll(roll[0]))
+    ifstream in;
+    in.open("data.dat", ios::in);
+    // if file is empty
+    if (!in.is_open())
     {
-        red();
-        cout << "\t(Invalid Rollnumber!)" << '\n';
-        black();
-        goto roll_again;
-    }
-    if(rollExist(roll[0]))
-    {
-        red();
-        cout << "\t(This Rollnumber already exists!)\n";
-        black();
-        goto roll_again;
-    }
-name_again:
-    cout << "\tEnter Name of Project Leader : ";
-    fflush(stdin);
-    cin.getline(memberName[0], 24);
-    if (!isValidName(memberName[0]))
-    {
-        red();
-        cout << "\t(Invalid Name! Please Use Alphabets Only.)" << '\n';
-        black();
-        goto name_again;
+        return 0;
     }
 
-    // making project leader's rollnumber as team's id
-    teamID = roll[0];
+    in.seekg(0, ios::end);              // moving cursor to the end of the file
+    int n = in.tellg() / sizeof(*this); // gives total bytes of the file
 
-    // details of other two members
-    for (int i = 1; i < 3; i++)
-    {
-        //member index title
-        green();
-        cout << "\n\tMEMBER " << i + 1;
-        cout << "\n\t--------\n";
-        black();
-
-        //rollnumbers of member
-roll_again2:
-        cout << "\tEnter Rollnumber of Member" << i + 1 << " : ";
-        fflush(stdin);
-        cin >> roll[i];
-        fflush(stdin);
-        if (!isValidRoll(roll[i]))
-        {
-            red();
-            cout << "\t(Invalid Rollnumber!)" << '\n';
-            black();
-            goto roll_again2;
-        }
-        if((rollExist(roll[i])) || (roll[i] == roll[0]) || (roll[1] == roll[2]))
-        {
-            red();
-            cout << "\t(This Rollnumber already exists!)\n";
-            black();
-            goto roll_again2;
-        }
-
-        //name of members
-name_again2:
-        cout << "\tEnter Name of Member" << i + 1 << " : ";
-        fflush(stdin);
-        cin.getline(memberName[i], 24);
-        if (!isValidName(memberName[i]))
-        {
-            red();
-            cout << "\t(Invalid Name! Please Use Alphabets Only.)" << '\n';
-            black();
-            goto name_again2;
-        }
-
-    }//end of input_details for 2members
+    return n; // returns total number of recors as totalsize/size_per_one_obj
 }
-/* ================================================== DISPLAY A TEAM ======================================================= */
-void MyClass::displayRecord()
+/* ===================================================== STORE DATA ============================================================= */
+void MyClass::storeData()
 {
-    cout << '\t' << std::left << setw(10) << teamID << setw(49) << projectName;
-    for (int i = 0; i < 3; i++)
+    ofstream fp;
+    fp.open("data.dat", ios::app);
+    fp.write((char *)this, sizeof(*this));
+    fp.close();
+}
+/* ===================================================== READ DATA =============================================================== */
+void MyClass::readData()
+{
+    ifstream fin;
+    fin.open("data.dat", ios::in);
+    if (fin.is_open() && numOfRecords() > 0)
     {
-        cout << setw(24) << memberName[i];
+        while (fin.read((char *)this, sizeof(*this)))
+        {
+            this->displayRecord();
+        }
+
+        fin.close();
     }
-    cout << '\n';
+    else
+    {
+        lightred();
+        cout << "\tNo Records Found! Add Records First.";
+        gray();
+    }
+}
+/* ===================================================== MENU ================================================================== */
+void MyClass::menu()
+{
+    int choice;
+    do
+    {
+        HEADER("PROJECT SCHEDULER");
+
+        cout << "\t1. ADD A TEAM" << '\n';
+        cout << "\t2. VIEW ALL TEAMS" << '\n';
+        cout << "\t3. EDIT A TEAM" << '\n';
+        cout << "\t4. SEARCH a TEAM" << '\n';
+        cout << "\t5. DELETE a TEAM" << '\n';
+        cout << "\t6. SCHEDULE THE LIST" << '\n';
+        cout << "\t0. EXIT" << '\n';
+
+        green();
+        fflush(stdin);
+        cout << "\n\tEnter your choice:\n\t>> ";
+        gray();
+        cin >> choice;
+
+        switch (choice)
+        {
+        case 1:
+            addTeam();
+            break;
+        case 2:
+            viewAllTeams();
+            break;
+        case 3:
+            editTeam();
+            break;
+        case 4:
+            searchTeam();
+            break;
+        case 5:
+            deleteTeam();
+            break;
+        case 6:
+            schedule();
+            break;
+        }
+    }
+    while (choice != 0);
 }
 /* ===================================================== ADD TEAM =========================================================== */
 void MyClass::addTeam()
@@ -255,9 +345,9 @@ void MyClass::addTeam()
     inputRecord();
     storeData();
 
-    darkgreen();
+    green();
     cout << "\n\tTeam Successfully Added.";
-    black();
+    gray();
 
     line('.');
     cout << "\tDo you want to Add Another?(Press 'y' for Yes)\n\t>> ";
@@ -274,22 +364,23 @@ void MyClass::viewAllTeams()
     // if there is records than only show the headings and stuff
     if (numOfRecords() > 0)
     {
-        darkgreen();
-        cout << "\tTOTAL TEAMs = " << numOfRecords() << "\n\n";
+        green();
+        cout << "\tTOTAL TEAMS = " << numOfRecords() << "\n\n";
+        gray();
         displayHeadings();
         readData();
     }
     else
     {
-        red();
+        lightred();
         cout << "\tNo Records Found! Add Records First.";
-        black();
+        gray();
     }
 
     cout << "\n\t";
-    purple();
+    lightpurple();
     system("pause");
-    black();
+    gray();
 }
 /* ===================================================== EDIT TEAM ========================================================== */
 void MyClass::editTeam()
@@ -313,7 +404,7 @@ void MyClass::editTeam()
         // asking rollnumber to compare and update if that rollnumber exists
         green();
         cout << "\n\tEnter the Group Leader's Rollnumber to Edit: ";
-        black();
+        gray();
         cin >> leaderRoll;
 
         // searching for the records and copying the data in tempfile
@@ -346,13 +437,13 @@ void MyClass::editTeam()
             rename("tempfile.dat", "data.dat");
             green();
             cout << "Record Successfully Updated.";
-            black();
+            gray();
         }
         else
         {
-            red();
+            lightred();
             cout << "\tNo Match Found!";
-            black();
+            gray();
         }
 
         line('.');
@@ -365,15 +456,15 @@ void MyClass::editTeam()
     }
     else
     {
-        red();
+        lightred();
         cout << "\tNo Records Found! Add Records First.";
-        black();
+        gray();
     }
 
     cout << "\n\t";
-    purple();
+    lightpurple();
     system("pause");
-    black();
+    gray();
 }
 
 /* ===================================================== SEARCH TEAM ============================================================== */
@@ -392,7 +483,7 @@ void MyClass::searchTeam()
         // asking rollnumber to compare and search if that rollnumber exists
         green();
         cout << "\n\tEnter the Group Leader's Rollnumber to Search: ";
-        black();
+        gray();
         cin >> leaderRoll;
 
         while (fp.read((char *)this, sizeof(*this)))
@@ -403,17 +494,28 @@ void MyClass::searchTeam()
                 HEADER("SEARCH A TEAM");
 
                 found = 1;
-                displayHeadings();
-                displayRecord();
+
+                cout << setw(12) << "\tPROJECT NAME : " << strupr(projectName);
+                cout << setw(12) << "\n\tTEAM ID      : " << roll[0];
+
+                green();
+                cout << "\n\n\tMEMBERS";
+                cout << "\n\t-------";
+                gray();
+
+                cout << "\n\tProject Leader : " << left << setw(24) << memberName[0] <<  "[ " << roll[0] << " ]"
+                     << "\n\tSecond Member  : " << left << setw(24) << memberName[1] <<  "[ " << roll[1] << " ]"
+                     << "\n\tThird Member   : " << left << setw(24) << memberName[2] <<  "[ " << roll[2] << " ]";
+
             }
         }
         fp.close();
 
         if (!found)
         {
-            red();
+            lightred();
             cout << "\tNo Match Found!";
-            black();
+            gray();
         }
 
         //If user wants to search again
@@ -426,12 +528,12 @@ void MyClass::searchTeam()
     }
     else
     {
-        red();
+        lightred();
         cout << "\tNo Records Found! Add Records First.";
         cout << "\n\t";
-        purple();
+        lightpurple();
         system("pause");
-        black();
+        gray();
     }
 }
 /* ===================================================== DELETE TEAM ============================================================== */
@@ -454,9 +556,9 @@ void MyClass::deleteTeam()
         readData();
 
         // asking rollnumber to compare and delete if that rollnumber exists
-        darkgreen();
+        green();
         cout << "\n\n\tEnter the Group Leader's Rollnumber to Delete: ";
-        black();
+        gray();
         cin >> leaderRoll;
 
         while (fp.read((char *)this, sizeof(*this)))
@@ -480,15 +582,15 @@ void MyClass::deleteTeam()
         {
             remove("data.dat");
             rename("tempfile.dat", "data.dat");
-            darkgreen();
+            green();
             cout << "\n\tRecord Successfully Deleted.";
-            black();
+            gray();
         }
         else
         {
-            red();
+            lightred();
             cout << "\tNo Match Found!";
-            black();
+            gray();
         }
 
         line('.');
@@ -502,104 +604,14 @@ void MyClass::deleteTeam()
     }
     else
     {
-        red();
+        lightred();
         cout << "\tNo Records Found! Add Records First.\n\t";
-        purple();
+        lightpurple();
         system("pause");
-        black();
+        gray();
     }
 }
 
-/* ===================================================== NUM OF RECORDS ======================================================= */
-int MyClass::numOfRecords()
-{
-    ifstream in;
-    in.open("data.dat", ios::in);
-    // if file is empty
-    if (!in.is_open())
-    {
-        return 0;
-    }
-
-    in.seekg(0, ios::end);              // moving cursor to the end of the file
-    int n = in.tellg() / sizeof(*this); // gives total bytes of the file
-
-    return n; // returns total number of recors as totalsize/size_per_one_obj
-}
-/* ===================================================== STORE DATA =============================================================== */
-void MyClass::storeData()
-{
-    ofstream fp;
-    fp.open("data.dat", ios::app);
-    fp.write((char *)this, sizeof(*this));
-    fp.close();
-}
-
-void MyClass::readData()
-{
-    ifstream fin;
-    fin.open("data.dat", ios::in);
-    if (fin.is_open() && numOfRecords() > 0)
-    {
-        while (fin.read((char *)this, sizeof(*this)))
-        {
-            this->displayRecord();
-        }
-
-        fin.close();
-    }
-    else
-    {
-        red();
-        cout << "\tNo Records Found! Add Records First.";
-        black();
-    }
-}
-/* ===================================================== MENU ================================================================== */
-void MyClass::menu()
-{
-    int choice;
-    do
-    {
-        HEADER("PROJECT SCHEDULER");
-
-        cout << "\t1. ADD a TEAM" << '\n';
-        cout << "\t2. VIEW all TEAMs" << '\n';
-        cout << "\t3. EDIT a team details" << '\n';
-        cout << "\t4. SEARCH a TEAM" << '\n';
-        cout << "\t5. DELETE a TEAM" << '\n';
-        cout << "\t6. Schedule TEAMs" << '\n';
-        cout << "\t0. EXIT" << '\n';
-
-        darkgreen();
-        cout << "\n\tEnter your choice:\n\t>> ";
-        black();
-        cin >> choice;
-
-        switch (choice)
-        {
-        case 1:
-            addTeam();
-            break;
-        case 2:
-            viewAllTeams();
-            break;
-        case 3:
-            editTeam();
-            break;
-        case 4:
-            searchTeam();
-            break;
-        case 5:
-            deleteTeam();
-            break;
-        case 6:
-            schedule();
-            break;
-        }
-    }
-    while (choice != 0);
-}
 /* ===================================================== SCHEDULE ================================================================== */
 void MyClass::schedule()
 {
@@ -635,7 +647,7 @@ void MyClass::schedule()
 
             green();
             cout << "\n\tEnter your choice:\n\t>> ";
-            black();
+            gray();
             cin >> sortChoice;
 
             switch (sortChoice)
@@ -720,9 +732,9 @@ void MyClass::schedule()
                 }
 
                 cout << "\n\t";
-                purple();
+                lightpurple();
                 system("pause");
-                black();
+                gray();
             }
         }
         while (sortChoice != 0);
@@ -731,13 +743,13 @@ void MyClass::schedule()
     }
     else
     {
-        red();
+        lightred();
         cout << "\tNo Records Found! Add Records First.";
-        black();
+        gray();
         cout << "\n\t";
-        purple();
+        lightpurple();
         system("pause");
-        black();
+        gray();
     }
 }
 
@@ -778,9 +790,12 @@ int *MyClass::randomGenerator(int *num, int n)
     return num;
 }
 
-/* ==========================================================================================================
+
+
+
+/* ========================================================================================================================
     AUTHENTICATION CLASS
-   ========================================================================================================== */
+   ======================================================================================================================== */
 class UserValidation
 {
 private:
@@ -789,64 +804,79 @@ private:
     int totalguess = 5;
 
 public:
-    void inputUser()
-    {
-        HEADER("LOGIN PAGE");
-        fflush(stdin);
-        cout << "\tEnter username: ";
-        cin >> username;
-        fflush(stdin);
-        cout << "\tEnter password: ";
-        strcpy(password, maskPassword(password));
-    }
-
-    bool validateUser()
-    {
-        while (guess < totalguess)
-        {
-            inputUser();
-            if ((strcmp(username, "admin") == 0) && (strcmp(password, "password") == 0))
-            {
-                return true;
-            }
-            else
-            {
-                red();
-                cout << "\n\tInvalid Username or Password! Try Again.\n\t(You have " << totalguess - guess - 1 << " try left.)\n\t";
-                purple();
-                system("pause");
-                black();
-                guess++;
-            }
-        }
-        return false;
-    }
-    char* maskPassword(char* pw)
-    {
-        int i = 0;
-        char ch;
-
-        while((ch = _getch()) != 13)
-        {
-            if(ch == 8)
-            {
-                --i;
-                cout << "\b \b";
-            }
-            else
-            {
-                pw[i] = ch;
-                cout << "*";
-                ++i;
-            }
-        }
-        pw[i] = '\0';
-
-        return pw;
-    }
-
+    void inputUser();
+    bool validateUser();
+    char* maskPassword(char*pw);
 };
 int UserValidation::guess = 0;
+
+/* ===================================================== INPUT LOGIN ========================================================= */
+void UserValidation::inputUser()
+{
+    HEADER("LOGIN PAGE");
+    fflush(stdin);
+    cout << "\tEnter Username: ";
+    cin >> username;
+    fflush(stdin);
+    cout << "\tEnter Password: ";
+    strcpy(password, maskPassword(password));
+}
+/* ===================================================== VALIDATE USER ========================================================= */
+bool UserValidation::validateUser()
+{
+    while (guess < totalguess)
+    {
+        inputUser();
+        if ((strcmp(username, "admin") == 0) && (strcmp(password, "password") == 0))
+        {
+            return true;
+        }
+        else
+        {
+            lightred();
+            cout << "\n\n\tInvalid Username or Password! Try Again.";
+            gray();
+
+            cout<<"\n\t(You have ";
+            lightred();
+            cout<< totalguess - guess - 1;
+            gray();
+            cout<<" try left.)\n\n\n\t";
+
+            lightpurple();
+            system("pause");
+            gray();
+            guess++;
+        }
+    }
+    return false;
+}
+/* ===================================================== MASK PASSWORD ========================================================= */
+char* UserValidation::maskPassword(char* pw)
+{
+    int i = 0;
+    char ch;
+
+    while((ch = _getch()) != 13)
+    {
+        if(ch == 8)
+        {
+            --i;
+            cout << "\b \b";
+        }
+        else
+        {
+            pw[i] = ch;
+            cout << "*";
+            ++i;
+        }
+    }
+    pw[i] = '\0';
+
+    return pw;
+}
+
+
 
 /* ==========================================================================================================
     MAIN FUNCTION
@@ -866,7 +896,7 @@ int main()
     else
     {
         system("cls");
-        red();
+        lightred();
         cout << "\n\n\tYou tried 5 times and could not validate yourself.\n\tSomething's Fishy!! ";
         system("pause");
     }
