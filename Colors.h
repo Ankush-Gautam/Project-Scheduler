@@ -26,67 +26,67 @@ HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 
 inline void black()
 {
-    SetConsoleTextAttribute(h,240);
+    SetConsoleTextAttribute(h, 240);
 }
 inline void blue()
 {
-    SetConsoleTextAttribute(h,241);
+    SetConsoleTextAttribute(h, 241);
 }
 inline void green()
 {
-    SetConsoleTextAttribute(h,242);
+    SetConsoleTextAttribute(h, 242);
 }
 inline void cyan()
 {
-    SetConsoleTextAttribute(h,243);
+    SetConsoleTextAttribute(h, 243);
 }
 inline void red()
 {
-    SetConsoleTextAttribute(h,244);
+    SetConsoleTextAttribute(h, 244);
 }
 inline void purple()
 {
-    SetConsoleTextAttribute(h,245);
+    SetConsoleTextAttribute(h, 245);
 }
 inline void yellow()
 {
-    SetConsoleTextAttribute(h,246);
+    SetConsoleTextAttribute(h, 246);
 }
 inline void white()
 {
-    SetConsoleTextAttribute(h,247);
+    SetConsoleTextAttribute(h, 247);
 }
-//lighter shaded
+// lighter shaded
 inline void gray()
 {
-    SetConsoleTextAttribute(h,248);
+    SetConsoleTextAttribute(h, 248);
 }
 inline void lightblue()
 {
-    SetConsoleTextAttribute(h,249);
+    SetConsoleTextAttribute(h, 249);
 }
 inline void lightgreen()
 {
-    SetConsoleTextAttribute(h,250);
+    SetConsoleTextAttribute(h, 250);
 }
 inline void lightcyan()
 {
-    SetConsoleTextAttribute(h,251);
+    SetConsoleTextAttribute(h, 251);
 }
 inline void lightred()
 {
-    SetConsoleTextAttribute(h,252);
+    SetConsoleTextAttribute(h, 252);
 }
 inline void lightpurple()
 {
-    SetConsoleTextAttribute(h,253);
+    SetConsoleTextAttribute(h, 253);
 }
 inline void lightyellow()
 {
-    SetConsoleTextAttribute(h,254);
+    SetConsoleTextAttribute(h, 254);
 }
 inline void lightwhite()
 {
-    SetConsoleTextAttribute(h,255);
+    SetConsoleTextAttribute(h, 255);
 }
 #endif // COLORS_H_INCLUDED
